@@ -1,0 +1,1 @@
+# Malaria-AI-Detection-System
