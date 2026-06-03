@@ -1,0 +1,24 @@
+# Python virtual environment
+.venv_malaria_brain/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+
+# IDE/editor files
+.vscode/
+*.swp
+*~
+
+# Dataset exports
+raw datasets/
+Thick_CLEAN/
+Thick_FINAL/
+
+# OS files
+.DS_Store
+Thumbs.db
