@@ -1,17 +1,15 @@
 import os
 import shutil
-from config import DEST_CLEAN_IMAGES, DEST_CLEAN_LABELS
+from config import DEST_CLEAN_IMAGES, DEST_CLEAN_LABELS, SRC_BASE, THIN_CLASSES
 from utils.analysis_utils import get_dataset_files, analyze_labels
 
+THIN_SOURCE_IMAGES = os.path.join(SRC_BASE, "Thin_Images", "images")
+THIN_SOURCE_LABELS = os.path.join(SRC_BASE, "Thin_Images", "labels_yolo")
 
-def analyze_dataset():
-    # Analyze the dataset for size, class distribution, and data quality issues.
-    print("Dataset Analysis")
-    print("=" * 60)
 
-    image_files, label_files, image_bases, label_bases = get_dataset_files(
-        DEST_CLEAN_IMAGES, DEST_CLEAN_LABELS
-    )
+def print_analysis_summary(dataset_name, image_files, label_files, image_bases, label_bases, analysis):
+    print(f"\n{dataset_name} Dataset Analysis")
+    print("-" * (len(dataset_name) + 16))
 
     # Dataset size
     print("\nDataset Size")
@@ -26,7 +24,6 @@ def analyze_dataset():
     print(f"Missing images: {len(missing_images)}")
 
     # Label analysis
-    analysis = analyze_labels(DEST_CLEAN_LABELS)
     print("\nClass Distribution")
     for class_id, count in sorted(analysis["class_counts"].items()):
         print(f"Class {class_id}: {count} annotations")
@@ -54,8 +51,56 @@ def analyze_dataset():
     print("\nStatus")
     print("Dataset is ready for training" if ready else "Dataset needs fixing")
 
+    return analysis
+
+
+def analyze_thick_dataset():
+    print("Dataset Analysis")
+    print("=" * 60)
+
+    image_files, label_files, image_bases, label_bases = get_dataset_files(
+        DEST_CLEAN_IMAGES, DEST_CLEAN_LABELS
+    )
+
+    analysis = analyze_labels(DEST_CLEAN_LABELS)
+    print_analysis_summary(
+        "Thick",
+        image_files,
+        label_files,
+        image_bases,
+        label_bases,
+        analysis,
+    )
+
     organize_problematic_labels(analysis)
     verify_integrity()
+
+
+def analyze_thin_dataset():
+    print("\nOriginal Thin Dataset Analysis")
+    print("=" * 32)
+
+    if not os.path.isdir(THIN_SOURCE_IMAGES) or not os.path.isdir(THIN_SOURCE_LABELS):
+        print("Thin dataset source path is missing. Skipping thin analysis.")
+        return
+
+    image_files, label_files, image_bases, label_bases = get_dataset_files(
+        THIN_SOURCE_IMAGES, THIN_SOURCE_LABELS
+    )
+
+    analysis = analyze_labels(THIN_SOURCE_LABELS)
+    print_analysis_summary(
+        "Thin",
+        image_files,
+        label_files,
+        image_bases,
+        label_bases,
+        analysis,
+    )
+
+    print("\nThin class reference")
+    for class_id, class_name in enumerate(THIN_CLASSES):
+        print(f"{class_id}: {class_name}")
 
 
 def organize_problematic_labels(analysis, output_dir="issues_report"):
@@ -116,6 +161,11 @@ def verify_integrity(output_dir="issues_report"):
             print(f"Missing in copy: {missing_in_copy}")
         if extra_in_copy:
             print(f"Extra in copy: {extra_in_copy}")
+
+
+def analyze_dataset():
+    analyze_thick_dataset()
+    analyze_thin_dataset()
 
 
 if __name__ == "__main__":
