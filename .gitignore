@@ -4,6 +4,9 @@
 # Local generated reports
 issues_report/
 
+# Local notes
+Malaria-AI-Dataset-Notes.docx
+
 # Python cache files
 __pycache__/
 *.py[cod]
@@ -25,7 +28,4 @@ Malaria_00_AI/Thick_FINAL/
 # OS files
 .DS_Store
 Thumbs.db
-
-# Notes
-Malaria-AI-Dataset-Notes.docx
 
